@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>table</title>
+    <script rel="preload" src="https://cdn.jsdelivr.net/npm/vue@2.5.13/dist/vue.js"></script>
+</head>
+<body>
+<div id="app">
+    <form @submit.prevent="getShifts">
+        <select v-model="category">
+          <option value="general">General</option>
+          <option value="group">Group</option>
+        </select>
+        <label for v-if="category=='group'">Group</label>
+        <select v-model="group" v-if="category=='group'">
+          <option v-for="index in 7" :value="index">{{index}}</option>
+        </select>
+        <label for>Month</label>
+        <select v-model="month" @change="getShifts">
+          <option v-for="index in 12" :value="index">{{index}}</option>
+        </select>
+
+        <input type="submit" value="Submit">
+    </form>
+    <h1>Roster for {{month_names[Number(month)-1]}}</h1>
+    <div class="grid7" v-if="category=='general'">
+      <div v-for="(value, property) in monthshift" class="grid3">
+        <h2 v-if="property!='last_index'">{{property}}</h2>
+        <div v-for="(value1, property1) in value">
+          <p>{{process(property1,value1)}}</p>
+        </div>
+      </div>
+    </div>
+    <div class="grid7" v-if="category=='group'">
+      <div v-for="(value, property) in monthshift" class="grid3">
+        <h2 v-if="property!='last_index'">{{property}}</h2>
+        <div v-for="(val, prop) in value">
+          <p v-if="visi(val)">{{prop}}</p>
+        </div>
+      </div>
+    </div>
+</div>
+
+<script>
+var myViewModel = new Vue({
+  el: '#app',
+  data() {
+    return {
+      month_names: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+      category: "group",
+      group: "5",
+      month: "1",
+      monthshift: []
+    }
+  },
+  methods: {
+    visi(val){
+      for(let i=0; i<val.length; i++){
+        if(this.group==val[i]){
+          return true;
+        }
+      }
+      return false;
+    },
+    process(prop, val) {
+        switch (prop) {
+          case "1":
+            return `morning: ${val.join(",")}`;
+          case "2":
+            return `afternoon: ${val.join(",")}`;
+          case "3":
+            return `night: ${val.join(",")}`;
+        }
+    },
+    getShifts() {
+      console.log('Fetching Roster');
+      // let response = await fetch(`http://localhost:5000/${this.month}`);
+      // let posts = await response.json();
+      // this.monthshift = posts.month;
+      // posts.month.forEach(element => {
+      //   this.monthshift.push(element);
+      // })
+      fetch(`http://localhost:5000/${this.month}`)
+      .then(response => {
+        return response.json();
+      })
+      .then(posts => {
+        this.monthshift = posts.month;
+      })
+    }
+  }
+});
+</script>
+<style>
+    input {
+      width: 30px;
+      border: 1px solid rgb(188, 192, 224);
+      border-radius: 8%;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    #app {
+      font-family: "Avenir", Helvetica, Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-align: center;
+      color: #2c3e50;
+      margin-top: 60px;
+    }
+    .grid7 {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-gap: -2px;
+      background-color: #fff;
+      text-align: left;
+    }
+
+    /* .grid3:nth-child(odd) {
+      color: #fff;
+      background-color: grey;
+      box-shadow: 0 0 5px #ccc;
+    }
+    .grid3:nth-child(even) {
+      box-shadow: 0 0 5px #ccc;
+    } */
+
+    .grid3 {
+      padding-right: 0;
+      border: 2px solid #333;
+    }
+    /* .grid3:nth-child(6n+0){
+      border-left: 0;
+    } */
+
+    h2,
+    p {
+      margin-top: 5px;
+      margin-bottom: 5px;
+      width: auto;
+      text-align: center;
+    }
+    h2{
+      font-size: 20px;
+    }
+    p{
+      font-size: 10px;
+    }
+
+    form::children {
+      margin-right: 15px;
+    }
+    </style>
+</body>
+</html>

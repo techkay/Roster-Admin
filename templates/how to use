@@ -1,0 +1,14 @@
+How to use
+Clone or download the git repository.
+$ git clone https://github.com/jonalxh/Flask-Admin-Dashboard.git
+Create and activate a virtual environment:
+$ virtualenv venv
+$ source venv/bin/activate
+Install the requirements inside the app folder
+$ pip install -r requirements.txt
+Once the process finishes give execution permission to app.py file and run it
+$ chmod +x app.py
+$ ./app.py
+The first execution will create automatically a sample sqlite database.
+Open your favorite browser and type
+localhost:5000/admin
